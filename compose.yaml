@@ -6,7 +6,7 @@ services:
     volumes:
       - ./storage/coral:/data
     environment:
-      - VDBAPI_BIND_ADDR=0.0.0.0:8080
+      - BIND_ADDR=0.0.0.0:8080
       - RUST_LOG=INFO
       - SEAHORSE_DB_NODES={"nodes":[{"name":"node1","endpoint":"redis://seahorse1:6379"},{"name":"node2","endpoint":"redis://seahorse2:6379"},{"name":"node3","endpoint":"redis://seahorse3:6379"}]}
 
