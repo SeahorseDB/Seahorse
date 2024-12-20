@@ -338,3 +338,4 @@ API for monitoring the health of SeahorseDB.
 - Sehyeon Oh(sehyeon@dnotitia.com)
 - Moohyeon Nam(mhnam@dnotitia.com)
 - Hyunsoo Cho(hyunsoo_cho@dnotitia.com)
+- Juhyeon Jeong(juhyeon.jeong@dnotitia.com)
