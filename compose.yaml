@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  coral:
+    image: oscoral
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./storage/coral:/app
+
+  seahorse1:
+    image: osseahorse
+    ports:
+      - "6388:6379"
+    volumes:
+      - ./storage/seahorse1:/app
+
+  seahorse2:
+    image: osseahorse
+    ports:
+      - "6389:6379"
+    volumes:
+      - ./storage/seahorse2:/app
+
+  seahorse3:
+    image: osseahorse
+    ports:
+      - "6390:6379"
+    volumes:
+      - ./storage/seahorse3:/app
