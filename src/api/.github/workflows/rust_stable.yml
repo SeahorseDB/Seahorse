@@ -1,0 +1,26 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "stable" ]
+  pull_request:
+    branches: [ "stable" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
+    - name: Build Docker image
+      run: docker build -t coral-rust-image .
+    - name: Run Docker container
+      run: docker run -d -p 8080:8080 coral-rust-image

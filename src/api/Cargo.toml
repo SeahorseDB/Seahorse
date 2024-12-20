@@ -1,0 +1,41 @@
+[package]
+name = "coral"
+version = "0.1.0"
+authors = ["D.N Data Team"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-cors = "0.7.0"
+actix-multipart = "0.7.2"
+actix-rt = "2.10.0"
+actix-web = "4.8.0"
+arrow-array = "52.2.0"
+arrow-buffer = "52.2.0"
+arrow-cast = "52.2.0"
+arrow-data = "52.2.0"
+arrow-ipc = "52.2.0"
+arrow-json = "52.2.0"
+arrow-schema = { version = "52.2.0", default-features = false, features = ["serde"] }
+arrow-select = "52.2.0"
+base64 = "0.22.1"
+byteorder = { version = "1.4.3" }
+bytes = "1.7.1"
+chrono = { version = "0.4.11", features = ["serde"] }
+datafusion = "41.0.0"
+deadpool-redis = { version = "0.16.0", features = ["serde"] }
+env_logger = "0.11.5"
+futures = "0.3.30"
+log = "0.4.22"
+parquet = "52.2.0"
+rand = "0.8.5"
+redis = "0.26.1"
+reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1.0.110", features = ["derive"] }
+serde_json = "1.0"
+sonic-rs = "0.3.14"
+sqlparser = "0.49.0"
+tempfile = "3.13.0"
+tokio = { version = "1", features = ["full"] }
+uuid = { version = "1.10.0", features = ["v4", "fast-rng", "macro-diagnostics",] }
