@@ -2,6 +2,11 @@
 
 The seahorse, a small marine fish, shares its name with the hippocampus, a vital brain region responsible for transferring short-term memory to long-term memory. Similarly, SeahorseDB, an in-memory database built on Redis, is designed for fast and scalable similarity search, acting as the computer's equivalent of the hippocampus for efficient data consolidation and retrieval. To ensure optimal performance, SeahorseDB incorporates various optimizations, making it a robust and high-performance solution for managing complex data operations.
 
+# Based on Redis 7.2.6
+This project is built upon Redis 7.2.6 (https://redis.io), an open-source in-memory data structure store.  
+Redis is licensed under the BSD 3-Clause License, and its copyright is held by Salvatore Sanfilippo.
+
+
 # Quick Start
 
 We recommend using the Docker images and the provided script to get started.
