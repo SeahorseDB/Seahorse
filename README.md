@@ -335,4 +335,5 @@ API for monitoring the health of SeahorseDB.
      curl -X GET http://localhost:3000/health
      ```
 # **Contributors**
-Sehyeon Oh(sehyeon@dnotitia.com)
+- Sehyeon Oh(sehyeon@dnotitia.com)
+- Moohyeon Nam(mhnam@dnotitia.com)
