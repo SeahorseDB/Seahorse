@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${K8S_POD_NAME}
+  namespace: ${K8S_NAME}
+  labels:
+    app: ${K8S_NAME}
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+    name: client
+  - port: 16379
+    targetPort: 16379
+    name: gossip
+  type: ClusterIP
+  selector:
+    statefulset.kubernetes.io/pod-name: ${K8S_POD_NAME}

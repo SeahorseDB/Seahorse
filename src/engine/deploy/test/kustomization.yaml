@@ -1,0 +1,36 @@
+resources:
+- ../base
+
+images:
+- name: registry:5000/seahorsedb
+  newName: ${REGISTRY_URL}/${IMAGE_NAME}
+  newTag: ${IMAGE_TAG}
+nameSuffix: ${K8S_NAME_SUFFIX}
+namespace: ${K8S_NAME}
+labels:
+- includeSelectors: true
+  pairs:
+    app: ${K8S_NAME}
+patches:
+- path: ./statefulset-patches.yaml
+
+configMapGenerator:
+- name: imagepullpolicy-config
+  options:
+    disableNameSuffixHash: true
+  literals:
+    - imagePullPolicy=Always
+
+replacements:
+- source:
+    kind: ConfigMap
+    name: imagepullpolicy-config
+    fieldPath: data.imagePullPolicy
+  targets:
+  - select:
+      kind: StatefulSet
+      name: seahorsedb
+    options:
+      create: true
+    fieldPaths:
+    - spec.template.spec.containers.*.imagePullPolicy

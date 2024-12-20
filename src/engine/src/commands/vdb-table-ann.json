@@ -1,0 +1,52 @@
+{
+  "ANN": {
+    "summary": "Search approximately [K] nearest neighbors from vector index in [Table Name] with [Query Vector], [Projection] and [Filter]. (for debug)",
+    "complexity": "O(log N)",
+    "group": "vdb",
+    "since": "7.2.4",
+    "arity": -6,
+    "container": "TABLE",
+    "function": "AnnCommand",
+    "command_flags": [
+    ],
+    "command_tips": [
+      "NONDETERMINISTIC_OUTPUT"
+    ],
+    "arguments": [
+      {
+        "name": "[Table Name]",
+        "type": "string",
+        "optional": false
+      },
+      {
+        "name": "[K]",
+        "type": "string",
+        "optional": false
+      },
+      {
+        "name": "[Query Vector]",
+        "type": "string",
+        "optional": false
+      },
+      {
+        "name": "[ef]",
+        "type": "string",
+        "optional": true
+      },
+      {
+        "name": "[Projection]",
+        "type": "string",
+        "optional": true
+      },
+      {
+        "name": "[Filter]",
+        "type": "string",
+        "optional": true
+      }
+    ],
+    "reply_schema": {
+      "description": "bulk string of scan results. (columns and distance)",
+      "type": "string"
+    }
+  }
+}

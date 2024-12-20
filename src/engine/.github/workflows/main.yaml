@@ -1,0 +1,134 @@
+name: seahorsedb
+on:
+  pull_request:
+  push:
+    tags:
+      - '*'
+env:
+  REGISTRY: registry
+  REGISTRY_URL: registry:5000
+
+  IMAGE_NAME: seahorsedb-test
+  IMAGE_TAG: ${{ github.sha }}
+  K8S_NAME_SUFFIX: -${{ github.sha }}
+  K8S_NAME: seahorsedb-${{ github.sha }}
+  K8S_TIMEOUT: ${{ vars.K8S_TIMEOUT }}
+  K8S_COUNT: ${{ vars.K8S_COUNT }} 
+  REGRESSION_TEST_DATA_DIR: ${{ vars.REGRESSION_TEST_DATA_DIR }}
+
+defaults:
+  run:
+    working-directory: .
+jobs:
+  seahorsedb_test:
+    runs-on: self-hosted
+    timeout-minutes: ${{ fromJSON(vars.REGRESSION_TEST_TIMEOUT) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: container build
+        id: container_build
+        run: |
+          docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+          docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}
+
+      - name: registry push
+        id: registry_push
+        run: |
+          docker push ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}
+
+      - name: deploy
+        id: k8s_deploy
+        run: |
+          envsubst < deploy/test/statefulset-patches.yaml | tee deploy/test/statefulset-patches.yaml
+          envsubst < deploy/test/kustomization.yaml | tee deploy/test/kustomization.yaml    
+          kubectl kustomize deploy/test > deploy/test/deploy.yaml
+          kubectl apply -f deploy/test/deploy.yaml
+          kubectl rollout status statefulset -n ${K8S_NAME} ${K8S_NAME} --watch --timeout=${K8S_TIMEOUT}m
+
+          service_dns_list=""
+          for ((i=0;i<${K8S_COUNT};i++))
+          do
+            export K8S_POD_NAME=${K8S_NAME}-${i}
+            service_dns_list+=${K8S_POD_NAME}.${K8S_NAME}.svc.cluster.local,
+            envsubst < deploy/test/pod-service-template.yaml | kubectl apply -f -
+          done
+
+          service_dns_list="${service_dns_list:0:${#service_dns_list}-1}"
+          echo "service_dns_list=${service_dns_list}" >> "$GITHUB_OUTPUT"
+          
+      - name: regression test
+        id: regression_test
+        run: |
+          export SEAHORSEDB_HOST=${{ steps.k8s_deploy.outputs.service_dns_list }}
+          python3 -u -m pytest tests/pytest_scripts/regression.py
+
+      - name: k8s clean
+        id: k8s_clean
+        if: ( always() ) && steps.k8s_deploy.outcome !='skipped'
+        continue-on-error: true
+        run: |
+          envsubst < deploy/test/statefulset-patches.yaml | tee deploy/test/statefulset-patches.yaml
+          envsubst < deploy/test/kustomization.yaml | tee deploy/test/kustomization.yaml    
+          kubectl kustomize deploy/test > deploy/test/deploy.yaml
+          kubectl delete -f deploy/test/deploy.yaml --ignore-not-found --timeout=${K8S_TIMEOUT}m
+
+      - name: registry clean
+        id: registry_clean
+        if: ( always() ) && steps.registry_push.outcome != 'skipped'
+        continue-on-error: true
+        run: |
+          digest=$(curl -v -sS -H "Accept: application/vnd.docker.distribution.manifest.v2+json" -X GET ${REGISTRY_URL}/v2/${IMAGE_NAME}/manifests/${IMAGE_TAG} 2>&1 | grep Docker-Content-Digest | awk '$2 == "Docker-Content-Digest:" { print $3 }' | tr -d $'\r')
+          if [ -z "$digest" ]; then
+            exit 0
+          fi
+          http_code=$(curl -v -sS --write-out '%{http_code}' --output /dev/null -H "Accept: application/vnd.docker.distribution.manifest.v2+json" -X DELETE "${REGISTRY_URL}/v2/${IMAGE_NAME}/manifests/${IMAGE_TAG}")
+          if [ "202" -ne "$http_code" ]; then
+            exit 1
+          fi
+          docker exec ${REGISTRY} bin/registry garbage-collect /etc/distribution/config.yml
+
+      - name: local clean
+        id: local_clean
+        if: ( always() ) && steps.container_build.outcome != 'skipped'
+        continue-on-error: true
+        run: |
+          if [ -n "$(docker images -q ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG} 2> /dev/null)" ]; then
+            (docker rmi ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG})
+          fi
+          if [ -n "$(docker images -q ${IMAGE_NAME}:${IMAGE_TAG} 2> /dev/null)" ]; then
+            (docker rmi ${IMAGE_NAME}:${IMAGE_TAG})
+          fi
+
+  deploy_tag:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [seahorsedb_test]
+    runs-on: self-hosted
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: container build
+        id: container_build
+        run: |
+          docker build -t ${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/}
+          docker tag ${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/} ${REGISTRY_URL}/${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/}
+
+      - name: registry push
+        id: registry_push
+        run: |
+          docker push ${REGISTRY_URL}/${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/}
+      
+      - name: local clean
+        id: local_clean
+        if: ( always() ) && steps.container_build.outcome != 'skipped'
+        continue-on-error: true
+        run: |
+          if [ -n "$(docker images -q ${REGISTRY_URL}/${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/} 2> /dev/null)" ]; then
+            (docker rmi ${REGISTRY_URL}/${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/})
+          fi
+          if [ -n "$(docker images -q ${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/} 2> /dev/null)" ]; then
+            (docker rmi ${GITHUB_REPOSITORY#*/}:${GITHUB_REF#refs/tags/})
+          fi

@@ -1,0 +1,5 @@
+resources:
+- seahorsedb-namespace.yaml
+- seahorsedb-config.yaml
+- seahorsedb-service.yaml
+- seahorsedb-statefulset.yaml

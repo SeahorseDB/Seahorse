@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seahorsedb
+  namespace: default
+  labels:
+    app: seahorsedb
+spec:
+  serviceName: seahorsedb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seahorsedb
+  template:
+    metadata:
+      labels:
+        app: seahorsedb
+    spec:
+      containers:
+      - name: seahorsedb
+        image: registry:5000/seahorsedb:test
+        ports:
+        - containerPort: 6379
+          name: tcp-client
+        - containerPort: 16379
+          name: tcp-gossip
+        command: ["redis-server", "/conf/redis.conf"]
+#        readinessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c
+#            - "redis-cli -h $(hostname) ping"
+#          initialDelaySeconds: 15
+#          timeoutSeconds: 60 #5
+#        livenessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c
+#            - "redis-cli -h $(hostname) ping"
+#          initialDelaySeconds: 20
+#          periodSeconds: 60 #3
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "redis-cli -h $(hostname) ping"
+          initialDelaySeconds: 20
+          periodSeconds: 30 
+          failureThreshold: 1000
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: conf
+          mountPath: /conf
+          readOnly: false
+        - name: seahorsedb-data
+          mountPath: /data
+          readOnly: false
+      terminationGracePeriodSeconds: 60
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: seahorsedb
+              topologyKey: kubernetes.io/hostname
+      volumes:
+      - name: conf
+        configMap:
+          name: seahorsedb-config
+          defaultMode: 0755
+  volumeClaimTemplates: 
+  - metadata:
+      name: seahorsedb-data
+      labels:
+        name: seahorsedb
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      #storageClassName: 
+      resources:
+        requests:
+          storage: 100Gi

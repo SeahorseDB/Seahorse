@@ -1,0 +1,26 @@
+{
+  "TEST": {
+    "summary": "Test if VDB C++ function works or not.",
+    "complexity": "O(1)",
+    "container": "VDB",
+    "group": "vdb",
+    "since": "7.2.4",
+    "arity": -2,
+    "function": "TestCommand",
+    "command_flags": [
+      "FAST",
+      "LOADING"
+    ],
+    "reply_schema": {
+      "description": "OK",
+      "type": "string"
+    },
+    "arguments": [
+      {
+        "name": "message",
+        "type": "string",
+        "optional": true
+      }
+    ]
+  }
+}

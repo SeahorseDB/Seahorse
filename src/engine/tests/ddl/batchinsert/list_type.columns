@@ -1,0 +1,1 @@
+ lbool list [ bool ] , lint8 list [ int8 ] , lint16 list [ int16 ] , lint32 list [ int32 ] , lint64 list [ int64 ] , luint8 list [ uint8 ] , luint16 list [ uint16 ] , luint32 list [ uint32 ] , luint64 list [ uint64 ] , lfloat list [ float ] , ldouble list [ double ] , lstring list [ string ] 

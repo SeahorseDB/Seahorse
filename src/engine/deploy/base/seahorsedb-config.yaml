@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seahorsedb-config
+  namespace: default
+  labels:
+    app: seahorsedb
+data:
+  redis.conf: |+
+    appendonly yes
+    save ''
+    auto-aof-rewrite-percentage 0
+    aof-use-rdb-preamble yes
+    active-set-size-limit 100000
+    loglevel verbose

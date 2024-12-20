@@ -1,0 +1,1 @@
+This directory contains bash scripts for helping to use the SeahorseDB project.
