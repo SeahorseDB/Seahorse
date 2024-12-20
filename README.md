@@ -13,7 +13,7 @@ We recommend using the Docker images and the provided script to get started.
 Once the service is running, you can use the RESTful APIs to perform operations.
 
 ```bash
-curl -X POST "http://127.0.0.1:3000/v0/health"
+curl -X POST "http://127.0.0.1:3000/health"
 ```
 
 
