@@ -3,27 +3,25 @@ services:
   coral:
     image: oscoral
     ports:
-      - "3000:3000"
+      - "3000:8080"
     volumes:
-      - ./storage/coral:/app
+      - ./storage/coral:/data
+    environment:
+      - VDBAPI_BIND_ADDR=0.0.0.0:8080
+      - RUST_LOG=INFO
+      - SEAHORSE_DB_NODES={"nodes":[{"name":"node1","endpoint":"redis://seahorse1:6379"},{"name":"node2","endpoint":"redis://seahorse2:6379"},{"name":"node3","endpoint":"redis://seahorse3:6379"}]}
 
   seahorse1:
     image: osseahorse
-    ports:
-      - "6388:6379"
     volumes:
-      - ./storage/seahorse1:/app
+      - ./storage/seahorse1:/data
 
   seahorse2:
     image: osseahorse
-    ports:
-      - "6389:6379"
     volumes:
-      - ./storage/seahorse2:/app
+      - ./storage/seahorse2:/data
 
   seahorse3:
     image: osseahorse
-    ports:
-      - "6390:6379"
     volumes:
-      - ./storage/seahorse3:/app
+      - ./storage/seahorse3:/data
