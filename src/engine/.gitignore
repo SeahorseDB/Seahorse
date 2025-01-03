@@ -1,19 +1,53 @@
+# Temporary editor files
 .*.swp
+.*.swo
+.*.swn
+*.pyc
+.ccls
+.ccls-cache/*
+*.dSYM
+.DS_Store
+.vscode/*
+.idea/*
+compile_commands.json
+
+# Build artifacts and object files
 *.o
 *.xo
 *.so
 *.d
+build/
+cmake-build-debug/
+
+# Log files
 *.log
 *.patch
 *.diff
+
+# Redis-specific files and binaries
 dump.rdb
+dump.vdb
+appendonly.aof*
+appendonlydir
 redis-benchmark
 redis-check-aof
 redis-check-rdb
 redis-check-dump
-redis-cli
-redis-sentinel
-redis-server
+ redis-cli
+ redis-sentinel
+ redis-server
+redis.ds
+/src/redis.conf
+/src/nodes.conf
+/src/transfer.sh
+# deps/lua/src/lua
+# deps/lua/src/luac
+# deps/lua/src/liblua.a
+# deps/hdr_histogram/libhdrhistogram.a
+# deps/fpconv/libfpconv.a
+# deps/jemalloc/configure*
+
+# Redis build-related files
 doc-tools
 release
 misc/*
@@ -22,31 +56,14 @@ appendonly.aof*
 appendonlydir
 SHORT_TERM_TODO
 release.h
-src/transfer.sh
-src/configs
-redis.ds
-src/redis.conf
-src/nodes.conf
-deps/lua/src/lua
-deps/lua/src/luac
-deps/lua/src/liblua.a
-deps/hdr_histogram/libhdrhistogram.a
-deps/fpconv/libfpconv.a
-deps/jemalloc/configure*
-tests/tls/*
 .make-*
 .prerequisites
-*.dSYM
-Makefile.dep
-.vscode/*
-.idea/*
-.ccls
-.ccls-cache/*
-compile_commands.json
-redis.code-workspace
+
+# Testing and TLS-related files
+tests/tls/*
+
+# Miscellaneous
+misc/*
 .cache/
-build/
-cmake-build-debug/
-.DS_Store
-*.patch
-*.pyc
+Makefile.dep
+redis.code-workspace
